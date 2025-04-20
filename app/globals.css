@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  color: white;
+  background-color: black;
+  min-height: 100vh;
+}
+
+/* Geometric patterns for backgrounds */
+.geometric-bg {
+  background-color: #0a0a0f;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ed1c24' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Hexagonal button styles */
+.hex-button {
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  transition: all 0.3s ease;
+}
+
+.hex-button:hover {
+  transform: scale(1.05);
+}
+
+/* Red outline for elements */
+.red-outline {
+  box-shadow: 0 0 0 1px rgb(237, 28, 36);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(20, 20, 25);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(40, 40, 45);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(237, 28, 36);
+}
+
+/* Add these utility classes for the theme colors */
+.bg-subrosa-red {
+  background-color: #ed1c24;
+}
+
+.bg-subrosa-dark {
+  background-color: #0a0a0f;
+}
+
+.bg-subrosa-darker {
+  background-color: #000000;
+}
+
+.bg-subrosa-light {
+  background-color: #28282d;
+}
+
+.bg-subrosa-gray {
+  background-color: #3a3a3f;
+}
+
+.text-subrosa-red {
+  color: #ed1c24;
+}
+
+.border-subrosa-red {
+  border-color: #ed1c24;
+}
+
+.border-subrosa-gray {
+  border-color: #3a3a3f;
+}
+
+.border-subrosa-light {
+  border-color: #28282d;
+}
