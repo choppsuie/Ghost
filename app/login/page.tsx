@@ -2,10 +2,10 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Shield } from "lucide-react"
+import { Shield, AlertCircle, CheckCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export default function Login() {
@@ -13,11 +13,32 @@ export default function Login() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [diagnosticInfo, setDiagnosticInfo] = useState<any>(null)
+  const [connectivityStatus, setConnectivityStatus] = useState<string | null>(null)
   const router = useRouter()
+
+  // Check connectivity on mount
+  useEffect(() => {
+    const checkConnectivity = async () => {
+      try {
+        const response = await fetch("/api/supabase-connectivity", { cache: "no-store" })
+        if (response.ok) {
+          setConnectivityStatus("Connected to Supabase")
+        } else {
+          setConnectivityStatus("Cannot connect to Supabase")
+        }
+      } catch (err) {
+        setConnectivityStatus("Network error checking Supabase connectivity")
+      }
+    }
+
+    checkConnectivity()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    setDiagnosticInfo(null)
 
     // Client-side validation
     if (!email || !email.includes("@")) {
@@ -33,54 +54,26 @@ export default function Login() {
     setLoading(true)
 
     try {
-      // Use a more direct approach with fetch
+      // Use fetch API to call our login endpoint
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
+        cache: "no-store",
       })
 
       const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.error || "Invalid credentials")
+      // Store diagnostic info for debugging
+      if (data.diagnostics) {
+        setDiagnosticInfo(data.diagnostics)
       }
 
-      // Success - redirect to dashboard
-      router.push("/dashboard")
-    } catch (err: any) {
-      console.error("Login error:", err)
-      setError(err.message || "An error occurred during login")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Alternative login function using direct Supabase client
-  const handleDirectLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-
-    if (!email || !password) {
-      setError("Email and password are required")
-      return
-    }
-
-    setLoading(true)
-
-    try {
-      // Dynamically import the Supabase client
-      const { createClient } = await import("@/utils/supabase/client")
-      const supabase = createClient()
-
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) throw error
+      if (!response.ok) {
+        throw new Error(data.error || "Login failed")
+      }
 
       // Success - redirect to dashboard
       router.push("/dashboard")
@@ -113,7 +106,22 @@ export default function Login() {
             <p className="text-gray-400 mt-2">Sign in to your Sub Rosa account</p>
           </div>
 
-          <form onSubmit={handleDirectLogin} className="space-y-6">
+          {connectivityStatus && (
+            <div
+              className={`mb-4 p-2 text-sm rounded flex items-center ${
+                connectivityStatus.includes("Cannot") ? "bg-red-900/20 text-red-500" : "bg-green-900/20 text-green-500"
+              }`}
+            >
+              {connectivityStatus.includes("Cannot") ? (
+                <AlertCircle className="mr-2" size={16} />
+              ) : (
+                <CheckCircle className="mr-2" size={16} />
+              )}
+              {connectivityStatus}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-1">
                 Email
@@ -152,8 +160,9 @@ export default function Login() {
             </div>
 
             {error && (
-              <div className="bg-red-500 bg-opacity-20 border border-red-500 text-red-500 px-4 py-3 rounded">
-                {error}
+              <div className="bg-red-500 bg-opacity-20 border border-red-500 text-red-500 px-4 py-3 rounded flex items-start">
+                <AlertCircle className="mr-2 mt-0.5 flex-shrink-0" size={16} />
+                <span>{error}</span>
               </div>
             )}
 
@@ -171,6 +180,15 @@ export default function Login() {
             </div>
           </form>
 
+          {diagnosticInfo && (
+            <div className="mt-6 p-4 bg-gray-800 rounded-md border border-gray-700">
+              <h3 className="text-sm font-medium text-gray-300 mb-2">Diagnostic Information</h3>
+              <pre className="text-xs text-gray-400 overflow-auto max-h-40">
+                {JSON.stringify(diagnosticInfo, null, 2)}
+              </pre>
+            </div>
+          )}
+
           <div className="mt-8 text-center">
             <p className="text-gray-400">
               Don't have an account?{" "}
@@ -178,6 +196,16 @@ export default function Login() {
                 Sign up
               </Link>
             </p>
+          </div>
+
+          <div className="mt-4 text-center">
+            <Link
+              href="/api/supabase-connectivity"
+              target="_blank"
+              className="text-xs text-gray-500 hover:text-gray-400"
+            >
+              Check Supabase Connectivity
+            </Link>
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 import { Shield, Lock, Menu, X } from "lucide-react"
+import ThemeSwitcher from "./ThemeSwitcher"
 
 export default function Navbar() {
   const [user, setUser] = useState(null)
@@ -27,7 +28,9 @@ export default function Navbar() {
         })
 
         return () => {
-          data?.subscription?.unsubscribe?.()
+          if (data?.subscription?.unsubscribe) {
+            data.subscription.unsubscribe()
+          }
         }
       } catch (error) {
         console.error("Error initializing auth:", error)
@@ -116,12 +119,18 @@ export default function Navbar() {
                 </Link>
               </>
             )}
+
+            {/* Add Theme Switcher */}
+            <ThemeSwitcher />
           </div>
 
           {/* Mobile menu button */}
-          <button className="md:hidden text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="md:hidden flex items-center space-x-3">
+            <ThemeSwitcher />
+            <button className="text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}

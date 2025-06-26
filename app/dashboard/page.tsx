@@ -1,22 +1,73 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
 import Link from "next/link"
+import { cookies } from "next/headers"
 import DVPNStatus from "@/components/DVPNStatus"
+import PrivacyScoreDashboard from "@/components/PrivacyScoreDashboard"
 import { Shield, Server, Settings, Activity } from "lucide-react"
 
 export default async function Dashboard() {
-  const supabase = createServerComponentClient({ cookies })
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  // Check for mock authentication
+  const cookieStore = cookies()
+  const mockAuth = cookieStore.get("mock_auth")?.value === "true"
+  const mockUserEmail = cookieStore.get("mock_user_email")?.value
 
-  if (!session) {
-    redirect("/login")
+  // If no mock auth, try to get session from Supabase
+  let userId = "mock-user-id"
+  let isAuthenticated = false
+
+  if (mockAuth && mockUserEmail) {
+    isAuthenticated = true
+    // Use a deterministic user ID based on email for mock users
+    userId = `mock-${mockUserEmail.replace(/[^a-zA-Z0-9]/g, "-")}`
+  } else {
+    try {
+      // Try to use Supabase auth as fallback
+      const { createServerComponentClient } = await import("@supabase/auth-helpers-nextjs")
+      const supabase = createServerComponentClient({ cookies })
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (session) {
+        isAuthenticated = true
+        userId = session.user.id
+      }
+    } catch (error) {
+      console.error("Error checking authentication:", error)
+      // Fall back to mock auth if Supabase fails
+      if (mockAuth && mockUserEmail) {
+        isAuthenticated = true
+        userId = `mock-${mockUserEmail.replace(/[^a-zA-Z0-9]/g, "-")}`
+      }
+    }
+  }
+
+  // If not authenticated, this will be handled by middleware
+  // But we'll add a fallback just in case
+  if (!isAuthenticated) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-subrosa-light p-6 rounded-lg border border-subrosa-gray text-center">
+          <h1 className="text-2xl font-bold mb-4">Authentication Required</h1>
+          <p className="mb-4">You need to be logged in to view this page.</p>
+          <Link
+            href="/login"
+            className="inline-block px-6 py-3 bg-subrosa-red text-white rounded-md hover:bg-opacity-90 transition-colors"
+          >
+            Go to Login
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {mockAuth && (
+        <div className="mb-4 bg-yellow-900 bg-opacity-30 border border-yellow-800 text-yellow-500 px-4 py-2 rounded-md">
+          <p className="text-sm font-medium">Demo Mode: You're using a demo account. Some features may be limited.</p>
+        </div>
+      )}
+
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Sub Rosa Dashboard</h1>
         <p className="text-gray-400">Manage your privacy settings and VM connection</p>
@@ -62,8 +113,8 @@ export default async function Dashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <DVPNStatus userId={session.user.id} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <DVPNStatus userId={userId} />
 
         <div className="space-y-6">
           <div className="bg-subrosa-light p-6 rounded-lg border border-subrosa-gray">
@@ -78,38 +129,54 @@ export default async function Dashboard() {
               Open VM Viewer
             </Link>
           </div>
+        </div>
+      </div>
 
-          <div className="bg-subrosa-light p-6 rounded-lg border border-subrosa-gray">
-            <h2 className="text-xl font-bold mb-4">Privacy Statistics</h2>
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm text-gray-400">Trackers Blocked</span>
-                  <span className="text-sm font-medium">1,248</span>
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
-                  <div className="bg-subrosa-red h-2 rounded-full" style={{ width: "85%" }}></div>
-                </div>
+      {/* Add Privacy Score Dashboard */}
+      <div className="mb-6">
+        <PrivacyScoreDashboard />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-subrosa-light p-6 rounded-lg border border-subrosa-gray">
+          <h2 className="text-xl font-bold mb-4">Privacy Statistics</h2>
+          <div className="space-y-4">
+            <div>
+              <div className="flex justify-between mb-1">
+                <span className="text-sm text-white">Trackers Blocked</span>
+                <span className="text-sm font-medium text-white">1,249</span>
               </div>
-
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm text-gray-400">Cookies Managed</span>
-                  <span className="text-sm font-medium">3,567</span>
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
-                  <div className="bg-subrosa-red h-2 rounded-full" style={{ width: "70%" }}></div>
-                </div>
+              <div className="w-full bg-gray-700 rounded-full h-2">
+                <div className="bg-subrosa-red h-2 rounded-full" style={{ width: "85%" }}></div>
               </div>
+            </div>
 
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm text-gray-400">Fingerprint Changes</span>
-                  <span className="text-sm font-medium">142</span>
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
-                  <div className="bg-subrosa-red h-2 rounded-full" style={{ width: "45%" }}></div>
-                </div>
+            <div>
+              <div className="flex justify-between mb-1">
+                <span className="text-sm text-white">Cookies Managed</span>
+                <span className="text-sm font-medium text-white">3,569</span>
+              </div>
+              <div className="w-full bg-gray-700 rounded-full h-2">
+                <div className="bg-subrosa-red h-2 rounded-full" style={{ width: "70%" }}></div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between mb-1">
+                <span className="text-sm text-white">Fingerprint Changes</span>
+                <span className="text-sm font-medium text-white">142</span>
+              </div>
+              <div className="w-full bg-gray-700 rounded-full h-2">
+                <div className="bg-subrosa-red h-2 rounded-full" style={{ width: "45%" }}></div>
+              </div>
+            </div>
+            <div>
+              <div className="flex justify-between mb-1">
+                <span className="text-sm text-white">Vulnerabilities</span>
+                <span className="text-sm font-medium text-white">0</span>
+              </div>
+              <div className="w-full bg-gray-700 rounded-full h-2">
+                <div className="bg-green-500 h-2 rounded-full" style={{ width: "5%" }}></div>
               </div>
             </div>
           </div>

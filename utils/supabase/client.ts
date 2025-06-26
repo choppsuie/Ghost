@@ -10,7 +10,10 @@ export const createClient = () => {
 
   try {
     // Create the client with minimal configuration
-    return createClientComponentClient<Database>()
+    return createClientComponentClient<Database>({
+      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    })
   } catch (error) {
     console.error("Error creating Supabase client:", error)
     return createMockClient()

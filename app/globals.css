@@ -2,15 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-subrosa-red: #ed1c24;
+  --color-subrosa-dark: #0a0a0f;
+  --color-subrosa-darker: #000000;
+  --color-subrosa-light: #28282d;
+  --color-subrosa-gray: #3a3a3f;
+  --color-text: #ffffff;
+  --color-text-secondary: #a0a0a0;
+}
+
+/* High contrast theme */
+.theme-high-contrast {
+  --color-subrosa-red: #ff0000;
+  --color-subrosa-dark: #000000;
+  --color-subrosa-darker: #000000;
+  --color-subrosa-light: #1a1a1a;
+  --color-subrosa-gray: #2a2a2a;
+  --color-text: #ffffff;
+  --color-text-secondary: #ffffff;
+}
+
+/* Dark contrast theme */
+.theme-dark-contrast {
+  --color-subrosa-red: #ff6b6b;
+  --color-subrosa-dark: #121212;
+  --color-subrosa-darker: #000000;
+  --color-subrosa-light: #1e1e1e;
+  --color-subrosa-gray: #2c2c2c;
+  --color-text: #f0f0f0;
+  --color-text-secondary: #c0c0c0;
+}
+
 body {
-  color: white;
-  background-color: black;
+  color: var(--color-text);
+  background-color: var(--color-subrosa-darker);
   min-height: 100vh;
 }
 
 /* Geometric patterns for backgrounds */
 .geometric-bg {
-  background-color: #0a0a0f;
+  background-color: var(--color-subrosa-dark);
   background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ed1c24' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
@@ -26,7 +58,7 @@ body {
 
 /* Red outline for elements */
 .red-outline {
-  box-shadow: 0 0 0 1px rgb(237, 28, 36);
+  box-shadow: 0 0 0 1px var(--color-subrosa-red);
 }
 
 /* Custom scrollbar */
@@ -35,51 +67,78 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgb(20, 20, 25);
+  background: var(--color-subrosa-dark);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(40, 40, 45);
+  background: var(--color-subrosa-light);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgb(237, 28, 36);
+  background: var(--color-subrosa-red);
 }
 
 /* Add these utility classes for the theme colors */
 .bg-subrosa-red {
-  background-color: #ed1c24;
+  background-color: var(--color-subrosa-red);
 }
 
 .bg-subrosa-dark {
-  background-color: #0a0a0f;
+  background-color: var(--color-subrosa-dark);
 }
 
 .bg-subrosa-darker {
-  background-color: #000000;
+  background-color: var(--color-subrosa-darker);
 }
 
 .bg-subrosa-light {
-  background-color: #28282d;
+  background-color: var(--color-subrosa-light);
 }
 
 .bg-subrosa-gray {
-  background-color: #3a3a3f;
+  background-color: var(--color-subrosa-gray);
 }
 
 .text-subrosa-red {
-  color: #ed1c24;
+  color: var(--color-subrosa-red);
 }
 
 .border-subrosa-red {
-  border-color: #ed1c24;
+  border-color: var(--color-subrosa-red);
 }
 
 .border-subrosa-gray {
-  border-color: #3a3a3f;
+  border-color: var(--color-subrosa-gray);
 }
 
 .border-subrosa-light {
-  border-color: #28282d;
+  border-color: var(--color-subrosa-light);
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Focus styles for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--color-subrosa-red);
+  outline-offset: 2px;
+}
+
+/* Screen reader only class */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { Shield, Lock, Globe } from "lucide-react"
+import { Shield, Lock, Globe, ChevronRight } from "lucide-react"
 
 export default function Home() {
   return (
@@ -10,12 +10,18 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-10 md:mb-0">
+              <div className="inline-block px-3 py-1 bg-subrosa-red bg-opacity-20 text-subrosa-red rounded-full text-sm font-medium mb-4">
+                Under the rose (in secrecy, privately)
+              </div>
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
                 Browse <span className="text-red-600">Under the Rose</span>
               </h1>
-              <p className="text-xl mb-8 text-gray-300 max-w-lg">
+              <p className="text-xl mb-4 text-gray-300 max-w-lg">
                 A privacy-first browser with integrated decentralized VPN. Reclaim your digital freedom and browse
                 securely.
+              </p>
+              <p className="text-lg mb-8 font-medium text-subrosa-red">
+                Unlike traditional browsers, Sub Rosa doesn't just make you invisible—it makes you invincible.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
@@ -66,6 +72,9 @@ export default function Home() {
               <p className="text-gray-300">
                 Route all traffic through a secure, peer-to-peer network that masks your location and identity.
               </p>
+              <Link href="/login" className="inline-flex items-center mt-4 text-subrosa-red hover:underline">
+                Learn more <ChevronRight size={16} className="ml-1" />
+              </Link>
             </div>
 
             {/* Feature 2 */}
@@ -77,6 +86,9 @@ export default function Home() {
               <p className="text-gray-300">
                 Block trackers, cookies, and fingerprinting attempts to keep your browsing habits private.
               </p>
+              <Link href="/login" className="inline-flex items-center mt-4 text-subrosa-red hover:underline">
+                Learn more <ChevronRight size={16} className="ml-1" />
+              </Link>
             </div>
 
             {/* Feature 3 */}
@@ -88,6 +100,9 @@ export default function Home() {
               <p className="text-gray-300">
                 Bypass geo-restrictions and censorship while maintaining complete privacy and security.
               </p>
+              <Link href="/login" className="inline-flex items-center mt-4 text-subrosa-red hover:underline">
+                Learn more <ChevronRight size={16} className="ml-1" />
+              </Link>
             </div>
           </div>
         </div>

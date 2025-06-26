@@ -3,19 +3,31 @@ import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 
 export async function GET(request: Request) {
-  try {
-    const requestUrl = new URL(request.url)
-    const code = requestUrl.searchParams.get("code")
+  const requestUrl = new URL(request.url)
+  const code = requestUrl.searchParams.get("code")
 
-    if (code) {
-      const supabase = createRouteHandlerClient({ cookies })
-      await supabase.auth.exchangeCodeForSession(code)
+  // If code is not present, redirect to login
+  if (!code) {
+    return NextResponse.redirect(new URL("/login", request.url))
+  }
+
+  try {
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+
+    // Exchange the code for a session
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+
+    if (error) {
+      console.error("Error exchanging code for session:", error)
+      // Redirect to login with error
+      return NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(error.message)}`, request.url))
     }
 
-    // URL to redirect to after sign in process completes
+    // Redirect to dashboard on success
     return NextResponse.redirect(new URL("/dashboard", request.url))
   } catch (error) {
-    console.error("Auth callback error:", error)
-    return NextResponse.redirect(new URL("/login?error=callback_error", request.url))
+    console.error("Unexpected error in auth callback:", error)
+    return NextResponse.redirect(new URL("/login?error=An unexpected error occurred", request.url))
   }
 }

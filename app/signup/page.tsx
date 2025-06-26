@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Shield, Lock, Eye } from "lucide-react"
+import { Shield, Lock, Eye, AlertCircle, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 export default function Signup() {
@@ -41,27 +41,31 @@ export default function Signup() {
     setLoading(true)
 
     try {
-      // Dynamically import the Supabase client
-      const { createClient } = await import("@/utils/supabase/client")
-      const supabase = createClient()
-
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
+      // Call our mock signup API
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
       })
 
-      if (error) throw error
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || `Signup failed with status: ${response.status}`)
+      }
 
       // Success
-      setSuccessMessage("Account created! Check your email for the confirmation link.")
+      setSuccessMessage(data.message || "Account created successfully! Redirecting to dashboard...")
 
-      // Optional: redirect after a delay
+      // Redirect to dashboard after a short delay
       setTimeout(() => {
-        router.push("/login")
-      }, 3000)
-    } catch (err: any) {
+        router.push("/dashboard")
+      }, 2000)
+    } catch (err) {
       console.error("Signup error:", err)
-      setError(err.message || "An error occurred during signup")
+      setError(err.message || "An error occurred during signup. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -129,6 +133,11 @@ export default function Signup() {
             </div>
             <h1 className="text-3xl font-bold">Create Your Account</h1>
             <p className="text-gray-400 mt-2">Join Sub Rosa for private, secure browsing</p>
+
+            {/* Demo Mode Indicator */}
+            <div className="mt-2 inline-block px-2 py-1 bg-amber-500 bg-opacity-20 border border-amber-500 text-amber-500 rounded-full text-xs">
+              Demo Mode
+            </div>
           </div>
 
           {successMessage ? (
@@ -195,12 +204,20 @@ export default function Signup() {
               </div>
 
               {error && (
-                <div className="bg-red-500 bg-opacity-20 border border-red-500 text-red-500 px-4 py-3 rounded">
-                  {error}
+                <div className="bg-red-500 bg-opacity-20 border border-red-500 text-red-500 px-4 py-3 rounded flex items-start">
+                  <AlertCircle className="mr-2 flex-shrink-0 mt-0.5" size={16} />
+                  <span>{error}</span>
                 </div>
               )}
 
-              <div>
+              <div className="bg-amber-500 bg-opacity-20 border border-amber-500 text-amber-500 px-4 py-3 rounded">
+                <p className="text-sm">
+                  <strong>Demo Mode:</strong> This is a demonstration version. Accounts created here are for testing
+                  purposes only.
+                </p>
+              </div>
+
+              <div className="flex flex-col space-y-3">
                 <button
                   type="submit"
                   disabled={loading}
@@ -208,8 +225,17 @@ export default function Signup() {
                     loading ? "opacity-70 cursor-not-allowed" : ""
                   }`}
                 >
-                  <Shield className="mr-2" size={18} />
-                  {loading ? "Creating Account..." : "Create Secure Account"}
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 animate-spin" size={18} />
+                      Creating Account...
+                    </>
+                  ) : (
+                    <>
+                      <Shield className="mr-2" size={18} />
+                      Create Demo Account
+                    </>
+                  )}
                 </button>
               </div>
             </form>

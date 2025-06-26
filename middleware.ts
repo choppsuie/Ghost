@@ -1,4 +1,3 @@
-import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs"
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
@@ -12,11 +11,21 @@ export async function middleware(req: NextRequest) {
       return res
     }
 
-    // Create a Supabase client configured to use cookies
-    const supabase = createMiddlewareClient({ req, res })
+    // Check for mock authentication cookie
+    const mockAuth = req.cookies.get("mock_auth")?.value === "true"
+    const mockUserEmail = req.cookies.get("mock_user_email")?.value
 
-    // Refresh session if expired
-    await supabase.auth.getSession()
+    // If using mock auth and trying to access protected routes, allow it
+    if (mockAuth && mockUserEmail && url.startsWith("/dashboard")) {
+      console.log("Mock authentication detected, allowing access to protected route")
+      return res
+    }
+
+    // Check if protected routes require authentication
+    if (url.startsWith("/dashboard") && (!mockAuth || !mockUserEmail)) {
+      // Redirect to login if accessing protected routes without authentication
+      return NextResponse.redirect(new URL("/login", req.url))
+    }
 
     return res
   } catch (error) {
