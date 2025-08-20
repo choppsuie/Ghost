@@ -2,6 +2,7 @@ import Link from "next/link"
 import { cookies } from "next/headers"
 import DVPNStatus from "@/components/DVPNStatus"
 import PrivacyScoreDashboard from "@/components/PrivacyScoreDashboard"
+import WalletManager from "@/components/WalletManager"
 import { Shield, Server, Settings, Activity } from "lucide-react"
 
 export default async function Dashboard() {
@@ -115,21 +116,7 @@ export default async function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <DVPNStatus userId={userId} />
-
-        <div className="space-y-6">
-          <div className="bg-subrosa-light p-6 rounded-lg border border-subrosa-gray">
-            <h2 className="text-xl font-bold mb-4 flex items-center">
-              <Server className="text-subrosa-red mr-2" />
-              VM Quick Access
-            </h2>
-            <Link
-              href="/dashboard/vm"
-              className="block w-full py-3 bg-subrosa-red text-white rounded-md text-center hover:bg-opacity-90 transition-colors"
-            >
-              Open VM Viewer
-            </Link>
-          </div>
-        </div>
+        <WalletManager userId={userId} />
       </div>
 
       {/* Add Privacy Score Dashboard */}
