@@ -15,7 +15,7 @@ export const metadata = {
   title: "Sub Rosa - Under the rose (in secrecy, privately)",
   description:
     "Unlike traditional browsers, Sub Rosa doesn't just make you invisible—it makes you invincible. Browse securely with integrated decentralized VPN, tracker blocking, and fingerprint spoofing.",
-    generator: 'v0.dev'
+    generator: 'v0.app'
 }
 
 export default function RootLayout({

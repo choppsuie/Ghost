@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 :root {
+  /* Sub Rosa brand colors */
   --color-subrosa-red: #ed1c24;
   --color-subrosa-dark: #0a0a0f;
   --color-subrosa-darker: #000000;
@@ -10,6 +11,41 @@
   --color-subrosa-gray: #3a3a3f;
   --color-text: #ffffff;
   --color-text-secondary: #a0a0a0;
+
+  /* Added semantic design tokens for consistent theming */
+  --background: #1f2937;
+  --foreground: #e5e7eb;
+  --card: #111827;
+  --card-foreground: #e5e7eb;
+  --popover: #111827;
+  --popover-foreground: #e5e7eb;
+  --primary: #b91c1c;
+  --primary-foreground: #ffffff;
+  --secondary: #ef4444;
+  --secondary-foreground: #ffffff;
+  --muted: #4b5563;
+  --muted-foreground: #ffffff;
+  --accent: #ef4444;
+  --accent-foreground: #ffffff;
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+  --border: #4b5563;
+  --input: #111827;
+  --ring: #b91c1c;
+  --chart-1: #ef4444;
+  --chart-2: #b91c1c;
+  --chart-3: #4b5563;
+  --chart-4: #e5e7eb;
+  --chart-5: #1f2937;
+  --radius: 0.5rem;
+  --sidebar: #111827;
+  --sidebar-foreground: #e5e7eb;
+  --sidebar-primary: #b91c1c;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ef4444;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #4b5563;
+  --sidebar-ring: #b91c1c;
 }
 
 /* High contrast theme */
