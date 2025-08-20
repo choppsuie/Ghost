@@ -2,9 +2,15 @@ import { type NextRequest, NextResponse } from "next/server"
 
 export async function POST(request: NextRequest) {
   try {
-    const { url, userId } = await request.json()
+    console.log("[v0] Proxy API: Received request")
+
+    const body = await request.json()
+    console.log("[v0] Proxy API: Request body:", body)
+
+    const { url, userId } = body
 
     if (!url || !userId) {
+      console.log("[v0] Proxy API: Missing required fields - url:", !!url, "userId:", !!userId)
       return NextResponse.json({ error: "URL and userId are required" }, { status: 400 })
     }
 
@@ -14,9 +20,16 @@ export async function POST(request: NextRequest) {
       // Add protocol if missing
       const urlToValidate = url.startsWith("http") ? url : `https://${url}`
       targetUrl = new URL(urlToValidate)
-    } catch {
+      console.log("[v0] Proxy API: Validated URL:", targetUrl.toString())
+    } catch (urlError) {
+      console.log("[v0] Proxy API: Invalid URL format:", url, urlError)
       return NextResponse.json({ error: "Invalid URL format" }, { status: 400 })
     }
+
+    console.log("[v0] Proxy API: Fetching from target URL:", targetUrl.toString())
+
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
 
     const response = await fetch(targetUrl.toString(), {
       headers: {
@@ -27,9 +40,14 @@ export async function POST(request: NextRequest) {
         Connection: "keep-alive",
       },
       redirect: "follow",
+      signal: controller.signal,
     })
 
+    clearTimeout(timeoutId)
+    console.log("[v0] Proxy API: External fetch response status:", response.status)
+
     if (!response.ok) {
+      console.log("[v0] Proxy API: External fetch failed:", response.status, response.statusText)
       return NextResponse.json(
         { error: `Failed to fetch: ${response.status} ${response.statusText}` },
         { status: response.status },
@@ -38,13 +56,15 @@ export async function POST(request: NextRequest) {
 
     const content = await response.text()
     const contentType = response.headers.get("content-type") || "text/html"
+    console.log("[v0] Proxy API: Content fetched, length:", content.length, "type:", contentType)
 
     const securityAnalysis = analyzeContentSecurity(content, targetUrl.toString())
+    console.log("[v0] Proxy API: Security analysis complete:", securityAnalysis)
 
     const title = extractTitle(content) || targetUrl.hostname
     const favicon = extractFavicon(content, targetUrl.toString())
 
-    return NextResponse.json({
+    const result = {
       content,
       contentType,
       status: response.status,
@@ -52,9 +72,21 @@ export async function POST(request: NextRequest) {
       blocked: securityAnalysis.blocked,
       title,
       favicon,
-    })
+    }
+
+    console.log("[v0] Proxy API: Returning successful response")
+    return NextResponse.json(result)
   } catch (error) {
-    console.error("Proxy API error:", error)
+    console.error("[v0] Proxy API error:", error)
+
+    if (error.name === "AbortError") {
+      return NextResponse.json({ error: "Request timeout" }, { status: 408 })
+    }
+
+    if (error.message?.includes("fetch")) {
+      return NextResponse.json({ error: "Failed to fetch external content" }, { status: 502 })
+    }
+
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

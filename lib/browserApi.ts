@@ -47,6 +47,8 @@ export class BrowserAPI {
     favicon?: string
   }> {
     try {
+      console.log("[v0] Browser API: Fetching content for URL:", url, "User:", userId)
+
       const response = await fetch("/api/proxy", {
         method: "POST",
         headers: {
@@ -55,14 +57,28 @@ export class BrowserAPI {
         body: JSON.stringify({ url, userId }),
       })
 
+      console.log("[v0] Browser API: Proxy response status:", response.status)
+      console.log("[v0] Browser API: Proxy response headers:", Object.fromEntries(response.headers.entries()))
+
+      const contentType = response.headers.get("content-type") || ""
+
+      if (!contentType.includes("application/json")) {
+        const text = await response.text()
+        console.log("[v0] Browser API: Non-JSON response received:", text.substring(0, 200))
+        throw new Error(`Server returned non-JSON response: ${response.status} ${response.statusText}`)
+      }
+
       if (!response.ok) {
         const error = await response.json()
+        console.log("[v0] Browser API: Error response:", error)
         throw new Error(error.error || "Failed to fetch content")
       }
 
-      return await response.json()
+      const result = await response.json()
+      console.log("[v0] Browser API: Successfully parsed JSON response")
+      return result
     } catch (error) {
-      console.error("Browser API error:", error)
+      console.error("[v0] Browser API error:", error)
       throw error
     }
   }
