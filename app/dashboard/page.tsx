@@ -3,6 +3,7 @@ import { cookies } from "next/headers"
 import DVPNStatus from "@/components/DVPNStatus"
 import PrivacyScoreDashboard from "@/components/PrivacyScoreDashboard"
 import WalletManager from "@/components/WalletManager"
+import SubscriptionManager from "@/components/SubscriptionManager"
 import { Shield, Server, Settings, Activity } from "lucide-react"
 
 export default async function Dashboard() {
@@ -122,6 +123,11 @@ export default async function Dashboard() {
       {/* Add Privacy Score Dashboard */}
       <div className="mb-6">
         <PrivacyScoreDashboard />
+      </div>
+
+      {/* Add SubscriptionManager component */}
+      <div className="mb-6">
+        <SubscriptionManager userAddress={userId} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
