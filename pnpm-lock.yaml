@@ -8,12 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@cosmjs/crypto':
-        specifier: ^0.36.0
-        version: 0.36.0
-      '@cosmjs/encoding':
-        specifier: ^0.32.4
-        version: 0.32.4
       '@cosmjs/proto-signing':
         specifier: latest
         version: 0.36.0
@@ -214,9 +208,6 @@ packages:
 
   '@cosmjs/crypto@0.36.0':
     resolution: {integrity: sha512-IdzJETWBfMlJIpWmcAi4wiAa0sdHKZDbxKdhasrpSLvhwIItXBYMvApCFx6zr+V/Hby4KnsWduI7HomiRDFr+g==}
-
-  '@cosmjs/encoding@0.32.4':
-    resolution: {integrity: sha512-tjvaEy6ZGxJchiizzTn7HVRiyTg1i4CObRRaTRPknm5EalE13SV+TCHq38gIDfyUeden4fCuaBVEdBR5+ti7Hw==}
 
   '@cosmjs/encoding@0.36.0':
     resolution: {integrity: sha512-xFJNd1096EqNxTsdOJN+DODC5HxKmqY0L2iWEnvPFq9UD/W2olYnv0bxV0S+XTs5tF/8/NAZHU3KXxeHTZ97DA==}
@@ -2004,12 +1995,6 @@ snapshots:
       '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
       hash-wasm: 4.12.0
-
-  '@cosmjs/encoding@0.32.4':
-    dependencies:
-      base64-js: 1.5.1
-      bech32: 1.1.4
-      readonly-date: 1.0.0
 
   '@cosmjs/encoding@0.36.0':
     dependencies:

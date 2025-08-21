@@ -1,3 +1,5 @@
+import { DirectSecp256k1HdWallet, StargateClient } from "./mockCosmjs"
+
 export interface SentinelNode {
   address: string
   moniker: string
@@ -29,10 +31,26 @@ export interface Subscription {
 export class MockSentinelClient {
   private rpcEndpoint: string
   private chainId: string
+  private wallet: any = null
+  private client: any = null
 
   constructor(rpcEndpoint: string, chainId: string) {
     this.rpcEndpoint = rpcEndpoint
     this.chainId = chainId
+  }
+
+  async connectWallet(mnemonic: string): Promise<string> {
+    this.wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic)
+    this.client = await StargateClient.connect(this.rpcEndpoint)
+    const accounts = await this.wallet.getAccounts()
+    return accounts[0].address
+  }
+
+  async getBalance(address: string, denom = "udvpn"): Promise<{ amount: string; denom: string }> {
+    if (!this.client) {
+      throw new Error("Client not connected")
+    }
+    return await this.client.getBalance(address, denom)
   }
 
   async getNodes(): Promise<SentinelNode[]> {
@@ -91,6 +109,14 @@ export class MockSentinelClient {
   async getSubscription(id: string): Promise<Subscription | null> {
     // Mock implementation
     return null
+  }
+
+  disconnect(): void {
+    if (this.client) {
+      this.client.disconnect()
+    }
+    this.wallet = null
+    this.client = null
   }
 }
 
